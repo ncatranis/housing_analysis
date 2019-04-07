@@ -1,5 +1,7 @@
 import os
+import math
 import pandas as pd
+import numpy as np
 import quandl
 import constants
 quandl.ApiConfig.api_key = constants.QUANDL_API_KEY
@@ -42,3 +44,25 @@ def cached_quandl_get(quandl_code, *args, **kwargs):
     data.to_pickle(filename)
     # return data
     return data
+
+def fit_to_array(single_or_iterable, desired_length):
+    """
+    Get a numpy array of the desired length by repeating/truncating either a single item or iterable of items
+
+    Examples:
+        >> fit_to_array(0, 4)
+        np.array([0,0,0,0])
+
+        >> fit_to_array([1,2,3], 7)
+        np.array([1,2,3,1,2,3,1])
+    """
+    if not hasattr(single_or_iterable, '__iter__'):
+        arr = np.array([single_or_iterable])
+    else:
+        arr = np.array(single_or_iterable)
+
+    if len(arr) < desired_length:
+        numberOfTilesNeeded = math.ceil(desired_length / float(len(arr)))
+        arr = np.tile(arr, numberOfTilesNeeded)
+
+    return arr[:desired_length]
