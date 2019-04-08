@@ -45,6 +45,18 @@ def cached_quandl_get(quandl_code, *args, **kwargs):
     # return data
     return data
 
+def compare_areas(areas, area_category_code, indicator_code, args_iterable=(), kwargs_iterable={}):
+    dataframes = []
+    for area_name, area_code in areas.items():
+        code = get_quandl_code(area_category_code, area_code, indicator_code)
+        try:
+            data = cached_quandl_get(code, *args_iterable, **kwargs_iterable)
+            data = data.rename(columns={'Value': area_name})
+            dataframes.append(data)
+        except Exception:
+            print('unable to fetch {}|{}'.format(area_name, area_code))
+    return pd.concat(dataframes, axis=1)
+
 def fit_to_array(single_or_iterable, desired_length):
     """
     Get a numpy array of the desired length by repeating/truncating either a single item or iterable of items
